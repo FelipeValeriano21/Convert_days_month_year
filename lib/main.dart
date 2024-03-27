@@ -1,0 +1,155 @@
+import 'package:ano_mes_dia/main.dart';
+import 'package:flutter/material.dart';
+
+void main() async {
+  runApp(MaterialApp(
+    home: const MyWidget(), 
+    theme: ThemeData (
+         hintColor: Colors.blue,
+         primaryColor: Colors.white,
+         inputDecorationTheme: const InputDecorationTheme(
+          enabledBorder: 
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+          focusedBorder: 
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+            hintStyle: TextStyle(color: Colors.lightBlueAccent))),
+  ));
+}
+class MyWidget extends StatefulWidget{
+  const MyWidget({super.key});
+  
+  @override
+  State<MyWidget> createState() => _MyWidgetState();
+} 
+
+class _MyWidgetState extends State<MyWidget> {
+  final anoControler = TextEditingController();
+  final mesControler = TextEditingController();
+  final diaControler = TextEditingController();
+
+  String _messagem = "";
+
+  GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+
+  int ano = 0;
+  int mes = 0;
+  int dia = 0;
+
+  _diaMesAnoParaDias() {
+
+    setState(() {
+      ano = int.parse(anoControler.text);
+      mes = int.parse(mesControler.text);
+      dia = int.parse(diaControler.text);
+
+      DateTime hoje = DateTime.now();
+
+      int dias = ((hoje.year - ano) * 365) + (hoje.month * 30) + dia;
+      _messagem = "VocÊ tem ${dias.toString()} dia(s)";
+
+      anoControler.clear();
+      mesControler.clear();
+      diaControler.clear();
+    });
+  }
+
+void _limpaCampos(){
+anoControler.clear();
+mesControler.clear();
+diaControler.clear();
+setState(() {
+  _messagem = "Informe os seus dados";
+  _formkey = GlobalKey<FormState>();
+});
+}
+
+@override
+Widget build(BuildContext context){
+  return Scaffold(
+    backgroundColor: Colors.white,
+    appBar: AppBar(
+      title: const Text(
+      "Ano/Mes/Dia para dias"),
+      backgroundColor: Colors.blue[700],
+      centerTitle: true,
+      actions: <Widget>[
+        IconButton(onPressed: _limpaCampos, icon: const Icon(Icons.refresh))
+      ],
+    ),
+    body: SingleChildScrollView(
+      padding: const EdgeInsets.all(10),
+      child: Form(
+        key: _formkey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Icon(
+              Icons.date_range,
+              size: 150,
+              color: Colors.blueAccent,
+            ),
+            construirTextField("Ano", "Ano:", anoControler, "Erro"),
+            const Divider(),
+          
+            construirTextField("Mês", "Mês:", mesControler, "Erro"),
+            const Divider(),
+
+            construirTextField("Dia", "Dia:", diaControler, "Erro"),
+            Padding(padding: const EdgeInsets.all(10),
+            child: ElevatedButton(
+              onPressed: (){
+                if (_formkey.currentState!.validate()){
+                  _diaMesAnoParaDias();
+
+                }
+
+            },
+
+            child: const Text (
+              "Converter", 
+              style: TextStyle(fontSize: 30, color: Colors.amber),
+            ),
+
+            )),
+            Center (
+              child: Text(
+                _messagem,
+                style: const TextStyle(
+                  color:Colors.red,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 30
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+ }
+}
+
+Widget construirTextField(String texto, String prefixo, TextEditingController c,
+String mensagemErro){
+  return TextFormField(
+    validator: (value) {
+      if (value!.isEmpty){
+        return mensagemErro;
+      } else{
+        return null;
+      }
+    },
+    controller: c,
+    decoration: InputDecoration(
+
+    labelText: texto,
+    labelStyle: const TextStyle(color: Colors.blue),
+    border: const OutlineInputBorder(),
+    prefixText: prefixo),
+  style: const TextStyle(color: Colors.black),
+  );
+}
+
+  
+
